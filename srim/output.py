@@ -95,12 +95,14 @@ class SRIM_Output(object):
         match = re.search(rb'Cos\(Z\)\s\r\n(.*)', output, re.DOTALL)
         if match:
             if match.group(1):
-                data = np.genfromtxt(BytesIO(match.group(1)), dtype=None, encoding=None)
-                data = np.array([list(row) for row in data])
                 # Sometimes the negative for the depth is separated from the number by two spaces
-                if data.shape[1] == 11:
-                    data = np.delete(data, 4, 1)
-                    data[:, 4] = ['-'+elem for elem in data[:, 4]]
+                # We handle this by removing the whitespace
+                clean_input = re.sub(rb'-\s+', rb'-', match.group(1))
+                data = np.genfromtxt(BytesIO(clean_input), dtype=None, encoding=None)
+                # Handling the case where the table has one row (this creates a 0-D numpy array)
+                if len(data.shape) == 0:
+                    data = [data.item()]
+                data = np.array([list(row) for row in data])
                 return data
         raise SRIMOutputParseError("unable to extract table from file")
 
