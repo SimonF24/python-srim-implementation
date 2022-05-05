@@ -37,7 +37,7 @@ class SRIM_Output(object):
         raise SRIMOutputParseError("unable to extract ion from file")
 
     def _read_alt_ion(self, output):
-        ion_regex = fr'TRIM Calc.=\s+({symbol_regex})\(({double_regex})\skeV\)'
+        ion_regex = fr'TRIM Calc.=\s+({symbol_regex})\(({double_regex})\s(keV|eV)\s*\)'
         match = re.search(ion_regex.encode('utf-8'), output)
         if match:
             symbol = str(match.group(1).decode('utf-8'))
